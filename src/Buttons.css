@@ -14,3 +14,11 @@
 .buttons_body > .MuiButton-root {
   text-transform: none !important;
 }
+
+.MuiSnackbarContent-root {
+  background-color: rgb(208 226 212) !important;
+  color: #0a5023 !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  min-width: 200px !important;
+}

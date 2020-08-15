@@ -6,28 +6,19 @@ function createDB() {
     console.log("creating db");
     var request = indexedDB.open("requests");
     request.onupgradeneeded = function (event) {
-        // Save the IDBDatabase interface 
         let dbUpgrade = event.target.result;
-
-        console.log("creating object store");
-
-        // Create an objectStore for this database
         var objectStore = dbUpgrade.createObjectStore("api", { autoIncrement: true });
     };
     request.onerror = function (event) {
-        console.log("Why didn't you allow my web app to use IndexedDB?!", event.target.errorCode);
+        console.log("Error:  ", event.target.errorCode);
     };
     request.onsuccess = function (event) {
-        console.log("success");
         db = event.target.result;
     };
 }
 
 function addData(url) {
-    console.log("adding data");
-
     return new Promise((resolve, reject) => {
-
         let tran = db.transaction('api', "readwrite");
         let objStore = tran.objectStore('api');
         objStore.add({ url: url, date: new Date().getTime() }).onsuccess =
@@ -39,7 +30,6 @@ function readDB() {
     let result = [];
     return new Promise((resolve, reject) => {
         let objectStore = db.transaction("api", "readwrite").objectStore("api");
-
         objectStore.openCursor().onsuccess = function (event) {
             var cursor = event.target.result;
             if (cursor) {
@@ -62,6 +52,20 @@ function removeData(key) {
     });
 };
 
+function syncData() {
+    readDB()
+        .then(async (data) => {
+            for (let i = 0; i < data.length; i++) {
+                console.log("sending data for key", data[i].key)
+                await fetch(data[i].value.url)
+                    .then(async (res) => {
+                        await removeData(data[i].key);
+                    })
+                    .catch((err) => { });
+            }
+        });
+}
+
 self.addEventListener('activate', function (event) {
     event.waitUntil(
         createDB()
@@ -80,17 +84,15 @@ self.addEventListener('fetch', function (event) {
                     `&operating_system_name=${params.get('os_name')}&utm_source=${params.get('x1')}&utm_medium=${params.get('x2')}` +
                     `&utm_campaign=${params.get('x3')}&campaign_url=${params.get('landing_url')}`;
                 if (navigator.onLine) {
-                    console.log("network available");
                     fetch(finalUrl)
                         .then((response) => { })
                         .catch((err) => {
                             addData(finalUrl);
                         });
+                    syncData();
                 } else {
                     addData(finalUrl);
-                    console.log("network unavailable");
                 }
-
                 return new Response({})
             }()
         );
@@ -99,19 +101,7 @@ self.addEventListener('fetch', function (event) {
 
 self.addEventListener('sync', async function (event) {
     if (event.tag === 'onlineSync') {
-        console.log("online now")
-        readDB()
-            .then(async (data) => {
-                for (let i = 0; i < data.length; i++) {
-                    console.log("sending data for key", data[i].key)
-                    await fetch(data[i].value.url)
-                        .then(async (res) => {
-                            await removeData(data[i].key);
-                        })
-                        .catch((err) => { });
-                }
-            });
-
+        syncData();
     }
 });
 

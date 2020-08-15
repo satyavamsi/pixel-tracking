@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment-timezone';
 
+import { Divider } from '@material-ui/core';
+
 import './RequestQueue.css';
 
 function RequestQueue() {
+
+    let requestEnd = null;
 
     let [requests, setRequests] = useState([]);
 
@@ -15,8 +19,6 @@ function RequestQueue() {
         request.onupgradeneeded = function (event) {
             // Save the IDBDatabase interface 
             let dbUpgrade = event.target.result;
-
-            console.log("creating object store");
 
             // Create an objectStore for this database
             var objectStore = dbUpgrade.createObjectStore("api", { autoIncrement: true });
@@ -39,9 +41,19 @@ function RequestQueue() {
                         setRequests(data);
                     })
             }
-        }, 5000)
+        }, 1000)
         return () => { clearInterval(dbInterval) }
     }, [db]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [requests])
+
+    const scrollToBottom = () => {
+        if (requestEnd) {
+            requestEnd.scrollIntoView({ behavior: "smooth" });
+        }
+    }
 
     const getData = () => {
         let result = [];
@@ -53,7 +65,7 @@ function RequestQueue() {
                 if (cursor) {
                     let url = new URL(cursor.value.url);
                     let params = url.searchParams;
-                    result.push({ type: params.get('utm_source'), time: moment(cursor.value.date).tz('Asia/Kolkata').format('MMMM Do, YYYY - h:mm:ss A') });
+                    result.push({ type: params.get('utm_source'), time: moment(cursor.value.date).tz('Asia/Kolkata').format('MMMM Do - h:mm:ss A') });
                     cursor.continue();
                 }
                 else {
@@ -62,16 +74,23 @@ function RequestQueue() {
             };
         });
     }
-    console.log("requests-----", ...requests);
     return (
         <div className="requestQueue">
-            <h2>RequestQueue</h2>
+            <h3>Pending Requests ({requests.length})</h3>
             <div className="requestQueue_body">
-                {requests.map((request) => {
+                {requests.map((request, index) => {
                     return (
-                        <p>{request.type} is clicked at {request.time}</p>
+                        <React.Fragment>
+                            <p>{index + 1}. {request.type} is clicked at {request.time}</p>
+                            <Divider />
+                        </React.Fragment>
                     )
                 })}
+                <div style={{ float: "left", clear: "both" }}
+                    ref={(el) => {
+                        requestEnd = el;
+                    }}>
+                </div>
             </div>
         </div>
     )

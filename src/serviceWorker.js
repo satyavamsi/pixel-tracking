@@ -41,15 +41,11 @@ export function register(config) {
       }
     });
   }
+
+  // adding online sync event
   window.addEventListener('online', () => {
     navigator.serviceWorker.ready.then(function (swRegistration) {
       return swRegistration.sync.register('onlineSync');
-    });
-  })
-
-  window.addEventListener('offline', () => {
-    navigator.serviceWorker.ready.then(function (swRegistration) {
-      return swRegistration.sync.register('offlineSync');
     });
   })
 
