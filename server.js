@@ -34,7 +34,7 @@ app.get('/pixel.gif', function (req, res, next) {
 
 
 
-// start express server on port 5000
+// start express server on port 3002
 app.listen(process.env.PORT || 3002, () => {
-    console.log("server started on port 443");
+    console.log(`server started on port ${process.env.PORT || '3002'}`);
 });
