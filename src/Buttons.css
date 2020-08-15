@@ -1,0 +1,16 @@
+.buttons {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.buttons_body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.buttons_body > .MuiButton-root {
+  text-transform: none !important;
+}
