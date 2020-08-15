@@ -3,7 +3,6 @@ let db;
 
 function createDB() {
 
-    console.log("creating db");
     var request = indexedDB.open("requests");
     request.onupgradeneeded = function (event) {
         let dbUpgrade = event.target.result;
@@ -44,7 +43,6 @@ function readDB() {
 }
 
 function removeData(key) {
-    console.log("removing data");
     return new Promise((resolve, reject) => {
         let tran = db.transaction('api', "readwrite");
         let objStore = tran.objectStore('api');
@@ -56,7 +54,6 @@ function syncData() {
     readDB()
         .then(async (data) => {
             for (let i = 0; i < data.length; i++) {
-                console.log("sending data for key", data[i].key)
                 await fetch(data[i].value.url)
                     .then(async (res) => {
                         await removeData(data[i].key);
@@ -75,7 +72,6 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', function (event) {
     if (/.gif/.test(event.request.url)) {
-        console.log("inside fetch here");
         event.respondWith(
             function () {
                 let url = new URL(event.request.url);
