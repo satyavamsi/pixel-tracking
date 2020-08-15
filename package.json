@@ -16,7 +16,7 @@
     "react-scripts": "3.4.3"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node server.js",
     "build": "rm -rf build/ && react-scripts build && npm run-script sw-epilog",
     "sw-epilog": "cat src/sw-epilog.js >> build/service-worker.js",
     "test": "react-scripts test",
