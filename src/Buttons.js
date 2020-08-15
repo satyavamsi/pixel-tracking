@@ -6,7 +6,7 @@ import './Buttons.css';
 export default function CButtons() {
 
     const handleClick = async (type) => {
-        await fetch(`http://localhost:3002/sample.gif?interaction=UserClick&client=ad_media&os_name=macos&x1=${type}&x2=button&x3=main&landing_url=localhost`)
+        await fetch(`${window.location.href}pixel.gif?interaction=UserClick&client=ad_media&os_name=macos&x1=${type}&x2=button&x3=main&landing_url=localhost`)
             .then((response) => {
                 console.log("request completed")
             })

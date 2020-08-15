@@ -23,7 +23,7 @@ app.use((req, res, next) => {
 
 app.use('/', express.static(`${__dirname}/build`));
 
-app.get('/sample.gif', function (req, res, next) {
+app.get('/pixel.gif', function (req, res, next) {
     console.log(req.query);
     res.writeHead(200, {
         'Content-Type': 'image/gif',
