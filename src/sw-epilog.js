@@ -18,6 +18,7 @@ function createDB() {
         console.log("Why didn't you allow my web app to use IndexedDB?!", event.target.errorCode);
     };
     request.onsuccess = function (event) {
+        console.log("success");
         db = event.target.result;
     };
 }

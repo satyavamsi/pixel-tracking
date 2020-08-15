@@ -12,6 +12,15 @@ function RequestQueue() {
     useEffect(() => {
         let request = indexedDB.open("requests");
 
+        request.onupgradeneeded = function (event) {
+            // Save the IDBDatabase interface 
+            let dbUpgrade = event.target.result;
+
+            console.log("creating object store");
+
+            // Create an objectStore for this database
+            var objectStore = dbUpgrade.createObjectStore("api", { autoIncrement: true });
+        };
         request.onerror = function (event) {
             console.log("DB Error", event.target.errorCode);
         };
@@ -25,7 +34,7 @@ function RequestQueue() {
     useEffect(() => {
         let dbInterval = setInterval(() => {
             if (db) {
-                getDate()
+                getData()
                     .then((data) => {
                         setRequests(data);
                     })
@@ -34,7 +43,7 @@ function RequestQueue() {
         return () => { clearInterval(dbInterval) }
     }, [db]);
 
-    const getDate = () => {
+    const getData = () => {
         let result = [];
         return new Promise((resolve, reject) => {
             let objectStore = db.transaction("api", "readwrite").objectStore("api");
